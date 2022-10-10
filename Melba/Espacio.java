@@ -4,6 +4,7 @@ import javax.swing.Timer;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +25,8 @@ public class Espacio extends JPanel implements ActionListener{
         timer.start();
     }
     public void paintComponent(Graphics g){
-        Particula p;
-        for(int i=0;i<500;i++){
-            p = particulas.get(i);
+        super.paintComponent(g);
+        for(Particula p: particulas){
             g.setColor(p.getColor());
             g.fillOval(p.getX(),p.getY(),2,2);
             System.out.println(p.getX());
@@ -40,6 +40,7 @@ public class Espacio extends JPanel implements ActionListener{
         window.setResizable(false);
         Espacio espacio = new Espacio();
         window.add(espacio);
+        window.setLocationRelativeTo(null);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
