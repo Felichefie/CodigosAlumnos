@@ -4,7 +4,6 @@ import javax.swing.Timer;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
