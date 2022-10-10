@@ -22,4 +22,10 @@ class Particula{
     public Color getColor(){
         return color;
     }
+
+    public void move (){
+        // caclulate Rando between -1 an +1
+        x += Math.random() > 0.5 ? 1 : -1;
+        y += Math.random() > 0.5 ? 1 : -1;
+    }
 }
