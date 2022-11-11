@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 class Client{
-    String ip;
+    String ipServer;
     int port;
     DataInputStream dis;
     DataOutputStream dos;
@@ -15,54 +15,72 @@ class Client{
     Thread sending;
     Scanner scanner;
 
-    public Client(String ip,int port){
-        this.ip=ip;
+    public Client(String ipServer,int port){
+        this.ipServer=ipServer;
         this.port=port;
         scanner=new Scanner(System.in);
     }
+    public static void main(String args[]){
+        Client client=new Client("127.0.0.1", 12000);
+        client.initSocket();
+    }
     public void initSocket(){
         try {
-            socket=new Socket(ip,port);
+            socket=new Socket(ipServer,port);
             dis=new DataInputStream(socket.getInputStream());
             dos=new DataOutputStream(socket.getOutputStream());
             listenerServer=new Thread(new Runnable(){
                 @Override
                 public void run(){
                     String msg;
-                    try {
-                        msg= dis.readUTF();
-                        System.out.println(msg);
-                    } catch (IOException e) {
+                    while(true){
+                        try {
+                           msg= dis.readUTF();
+                            System.out.println(msg);
                         
-                        e.printStackTrace();
-                    }
-                    
+                        } catch (IOException e) {
+                        
+                          e.printStackTrace();
+                        }
+                    } 
                 }
             });
             sending=new Thread(new Runnable(){
                 @Override
                 public void run(){
-                    String msg;
+                   
+                }
+            });
+            listenerServer.start();
+            while(true){
+                String msg;
+                while(socket.isConnected()){
+                    
                     msg= scanner.nextLine();
-                    System.out.println(msg);
+                    
                     try {
-                        dos.writeUTF(msg);
-                    } catch (IOException e) {
-                        
+                       dos.writeUTF(msg);
+                       if(msg.equals("out")){
+                        break;
+                    }
+                 } catch (IOException e) {
+                    
                         e.printStackTrace();
                     }
                 }
-            });
-
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    
+                    e.printStackTrace();
+                }
+            }
         } catch (UnknownHostException e) {
             
             e.printStackTrace();
         } catch (IOException e) {
-            
+            System.out.println("Server down");
             e.printStackTrace();
         }
-    }
-
-    
-    
+    } 
 }

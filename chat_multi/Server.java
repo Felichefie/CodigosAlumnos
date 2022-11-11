@@ -14,7 +14,7 @@ class Server{
     DataInputStream dis;
     DataOutputStream dos;
     BufferedInputStream bis;
-    Vector<ClientHandler> clients=new Vector<ClientHandler>();
+    static Vector<ClientHandler> clients=new Vector<ClientHandler>();
     int nClients=0;
     Thread thread;
     ClientHandler client;
@@ -26,15 +26,16 @@ class Server{
     public void powerUp(){
         try {
             server=new ServerSocket(port);
-            while(true){
+            while(!server.isClosed()){
                 socket=server.accept();
                 bis=new BufferedInputStream(socket.getInputStream());
                 dis=new DataInputStream(bis);
                 dos=new DataOutputStream(socket.getOutputStream());
                 client=new ClientHandler(socket, dis, dos,"client"+nClients);
-                nClients++;
+                thread=new Thread(client);
                 clients.add(client);
-                
+                thread.start();
+                nClients++;
             }
         } catch (IOException e) {
             System.out.println("no sirvio");
@@ -68,21 +69,30 @@ class ClientHandler implements Runnable{
             try {
                 bis=new BufferedInputStream(socket.getInputStream());
                 dis=new DataInputStream(bis);
-                while(true){
+                while(socket.isConnected()){
                     msg=dis.readUTF();
                     StringTokenizer st=new StringTokenizer(msg,"#");
                     String content=st.nextToken();
-                    String name=st.nextToken(content);
-                    for(int i=0;i<clients.size;i++){
-                        ClientHandler ch=clients[i];
+                    String name=st.nextToken();
+                    System.out.println(name);
+                    System.out.println(content);
+                    for(int i=0;i<Server.clients.size();i++){
+                        ClientHandler ch=Server.clients.get(i);
                         if(ch.name.equals(name)){
-                            dos.writeUTF(content);
+                            String txt="from: "+name+" msg: "+content;
+                            System.out.println(txt);
+                            dos.writeUTF(txt);
                         }
                     }
                 }
             } catch (IOException e) {
                 if(socket.isConnected()){
-                    socket.close();
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        
+                        e1.printStackTrace();
+                    }
                 }
                 e.printStackTrace();
             }
